@@ -28,8 +28,7 @@ brew bundle --file=Desktop/MACOSSetupScript/Brewfile
 function download_openvpn_config {
   echo "Downloading OpenVPN config..."
   git clone https://github.com/dr0pp3dpack3ts/openssh-files.git
-  cd openssh-files
-  ./openvpn.sh --import-config --config-file=cyberalvin.ovpn
+  openvpn --import-config --config-file=Desktop/openssh-files/cyberalvin.ovpn
 }
 
 function start_macos_services {
