@@ -1,49 +1,48 @@
-#Install oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sed 's:env zsh::g' | sed 's:chsh -s .*$::g')"
+#!/bin/zsh
 
-#Install homebrew
-sudo mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
-echo 'PATH=$PATH:~/homebrew/sbin:~/homebrew/bin:/opt/local/bin' >> .zshrc
-chsh -s /bin/zsh
-brew update
-export HOMEBREW_NO_ANALYTICS=1
-brew analytics off
-sudo chown -R $(whoami) /usr/local/lib/pkgconfig
+# Purpose: Automates the setup of a MacOS development environment
 
-#install brew packages
-brew install openvpn
-brew install --cask visual-studio-code
-brew install --cask notion
-brew install --cask powershell
-brew install --cask iterm2
-brew install --cask google-chrome
-brew install --cask microsoft-remote-desktop
+set -e
 
-#Install Communication Software
-brew install --cask discord
+function install_oh_my_zsh {
+  echo "Installing oh-my-zsh..."
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sed 's:env zsh::g' | sed 's:chsh -s .*$::g')"
+}
 
-#Install zsh tools
-brew install zsh-autosuggestions
-brew install zsh-syntax-highlighting
-brew install zsh-completions
-brew install zsh-history-substring-search
-brew install zsh-interactive-cd
-brew install zsh-navigation-tools
+function install_homebrew {
+  echo "Installing Homebrew..."
+  sudo -H mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+  echo 'PATH=$PATH:~/homebrew/sbin:~/homebrew/bin:/opt/local/bin' >> ~/.zshrc
+  chsh -s /bin/zsh
+  brew update
+  export HOMEBREW_NO_ANALYTICS=1
+  brew analytics off
+  sudo chown -R $(whoami) /usr/local/lib/pkgconfig
+}
 
+function install_brew_packages {
+echo "Installing Brew Packages..."
+brew bundle --file=Desktop/MACOSSetupScript/Brewfile
+}
 
-#Download openvpn config
-git clone https://github.com/dr0pp3dpack3ts/openssh-files.git
-cd openssh-files
-./openvpn.sh --import-config --config-file=cyberalvin.ovpn
+function download_openvpn_config {
+  echo "Downloading OpenVPN config..."
+  git clone https://github.com/dr0pp3dpack3ts/openssh-files.git
+  cd openssh-files
+  ./openvpn.sh --import-config --config-file=cyberalvin.ovpn
+}
 
-# #Install powerlevel10k
-# git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+function start_macos_services {
+  echo "Starting MacOS services..."
+  softwareupdate -i -a --restart
+}
 
-# zsh_theme="powerlevel10k/powerlevel10k"
-# sed -i '' "s/robbyrussell/$zsh_theme/g" ~/.zshrc
+install_oh_my_zsh
+install_homebrew
+install_brew_packages
+install_zsh_tools
+download_openvpn_config
+install_powerlevel10k
+start_macos_services
 
-
-
-
-#Starting MACOS services
-softwareupdate -i -a --restart
+echo "MacOS development environment setup complete!"
